@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
     {
       auth: {
         user: Current.user ? { email_address: Current.user.email_address } : nil
+      },
+      flash: {
+        notice: flash[:notice],
+        alert: flash[:alert]
       }
     }
   end
