@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_23_144153) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_160000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -49,6 +49,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_144153) do
     t.index ["openclaw_agent_id"], name: "index_agents_on_openclaw_agent_id", unique: true
   end
 
+  create_table "daily_memory_entries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.date "entry_date", null: false
+    t.string "project"
+    t.text "summary", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entry_date"], name: "index_daily_memory_entries_on_entry_date"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -75,6 +85,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_144153) do
     t.datetime "timestamp"
     t.datetime "updated_at", null: false
     t.index ["task_id"], name: "index_task_activities_on_task_id"
+  end
+
+  create_table "task_recurring_schedules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.integer "day_of_month"
+    t.integer "day_of_week"
+    t.json "days_of_week"
+    t.string "frequency_type"
+    t.integer "interval"
+    t.integer "month_of_year"
+    t.datetime "next_run_at"
+    t.integer "task_template_id", null: false
+    t.json "times_of_day"
+    t.datetime "updated_at", null: false
+    t.index ["task_template_id"], name: "index_task_recurring_schedules_on_task_template_id"
   end
 
   create_table "task_templates", force: :cascade do |t|
@@ -124,6 +150,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_144153) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "task_activities", "tasks"
+  add_foreign_key "task_recurring_schedules", "task_templates"
   add_foreign_key "task_templates", "agents"
   add_foreign_key "tasks", "agents"
   add_foreign_key "tasks", "task_templates"

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get  "activity" => "activity#index"
   get   "settings" => "settings#index"
   patch "settings" => "settings#update", as: :update_settings
+  resources :daily_memory_entries, path: "daily-memory", only: %i[index create]
 
   namespace :api do
     resources :tasks, only: %i[index] do

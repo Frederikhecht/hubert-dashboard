@@ -60,4 +60,6 @@ Rails.application.configure do
 
   # Active Storage local disk service.
   config.active_storage.service = :local
+
+  config.solid_queue.connects_to = { database: { writing: :queue } }
 end

@@ -286,6 +286,13 @@ Visit `http://localhost:3001` and log in.
 
 ---
 
+## Daily Memory Log
+
+A dedicated **Memory** page is available via the sidebar (or at `/daily-memory`). This view is read-only: entries are created automatically after every conversation, so there’s no need to submit manual logs. Use the left-hand journal feed to search and select a day, then review the expanded details on the right to jog your memory.
+
+Treat the Daily Memory Log as the canonical reference when you ask me about past work or decisions — anything written there should still be the first place you look before relying on long-term memory elsewhere.
+
+
 ## Background Jobs
 
 `TaskDispatcherJob` runs every 2 minutes in both development and production (configured in `config/recurring.yml`).
