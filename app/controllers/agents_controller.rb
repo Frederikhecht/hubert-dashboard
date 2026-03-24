@@ -1,6 +1,6 @@
 class AgentsController < ApplicationController
   def index
-    openclaw = Openclaw::Service.new
+    openclaw = OpenclawService.new
     agents = openclaw.agents.map do |agent|
       db_agent = Agent.find_by(openclaw_agent_id: agent[:id])
       agent.merge(dbId: db_agent&.id&.to_s)
@@ -14,11 +14,18 @@ class AgentsController < ApplicationController
 
   def show
     @agent = Agent.find(params[:id])
-    openclaw = Openclaw::Service.new
+    openclaw = OpenclawService.new
     oc_agent = openclaw.agent(@agent.openclaw_agent_id)
+
+    activities = TaskActivity.joins(:task)
+      .where(tasks: { agent_id: @agent.id })
+      .includes(task: :agent)
+      .order(timestamp: :desc)
+      .limit(50)
 
     render inertia: "Agents/Show", props: {
       agent: serialize_agent(@agent, oc_agent),
+      activities: activities.map { |a| serialize_activity(a) },
       openclawAvailable: openclaw.available?
     }
   end
@@ -30,7 +37,7 @@ class AgentsController < ApplicationController
   end
 
   def sync
-    result = Agents::SyncService.new.call
+    result = AgentSyncService.new.call
     parts = []
     parts << "#{result[:created].size} added"  if result[:created].any?
     parts << "#{result[:updated].size} updated" if result[:updated].any?
@@ -40,6 +47,20 @@ class AgentsController < ApplicationController
   end
 
   private
+
+  def serialize_activity(activity)
+    {
+      id: activity.id.to_s,
+      action: activity.action,
+      details: activity.details,
+      timestamp: activity.timestamp.iso8601,
+      taskId: activity.task_id.to_s,
+      taskTitle: activity.task.title,
+      agentId: activity.task.agent_id&.to_s,
+      agentName: activity.task.agent&.name,
+      agentAvatarUrl: activity.task.agent&.avatar_url
+    }
+  end
 
   def serialize_agent(db_agent, oc_agent)
     {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_23_133605) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_23_144153) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -58,6 +58,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_133605) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "skills", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.string "slug"
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_skills_on_slug", unique: true
+  end
+
+  create_table "task_activities", force: :cascade do |t|
+    t.string "action"
+    t.datetime "created_at", null: false
+    t.string "details"
+    t.integer "task_id", null: false
+    t.datetime "timestamp"
+    t.datetime "updated_at", null: false
+    t.index ["task_id"], name: "index_task_activities_on_task_id"
+  end
+
+  create_table "task_templates", force: :cascade do |t|
+    t.integer "agent_id"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "skill"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_id"], name: "index_task_templates_on_agent_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.integer "agent_id"
+    t.datetime "archived_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "dispatched_at"
+    t.integer "position", default: 0, null: false
+    t.datetime "scheduled_for"
+    t.string "session_key"
+    t.string "skill"
+    t.string "status", default: "queue", null: false
+    t.bigint "task_recurring_schedule_id"
+    t.integer "task_template_id"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["agent_id"], name: "index_tasks_on_agent_id"
+    t.index ["archived_at"], name: "index_tasks_on_archived_at"
+    t.index ["status"], name: "index_tasks_on_status"
+    t.index ["task_recurring_schedule_id"], name: "index_tasks_on_task_recurring_schedule_id"
+    t.index ["task_template_id"], name: "index_tasks_on_task_template_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -71,4 +123,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_23_133605) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "task_activities", "tasks"
+  add_foreign_key "task_templates", "agents"
+  add_foreign_key "tasks", "agents"
+  add_foreign_key "tasks", "task_templates"
 end

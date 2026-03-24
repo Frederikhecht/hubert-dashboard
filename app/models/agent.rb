@@ -1,5 +1,8 @@
 class Agent < ApplicationRecord
   has_one_attached :avatar
+  has_many :tasks, dependent: :nullify
+
+  scope :active_agents, -> { where(active: true) }
 
   validates :openclaw_agent_id, presence: true, uniqueness: true
 
@@ -12,6 +15,6 @@ class Agent < ApplicationRecord
 
   # Delegates live status check to OpenClaw service.
   def status
-    Openclaw::Service.new.agent_status(openclaw_agent_id)
+    OpenclawService.new.agent_status(openclaw_agent_id)
   end
 end
